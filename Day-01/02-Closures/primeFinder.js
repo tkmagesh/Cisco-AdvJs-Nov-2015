@@ -26,7 +26,7 @@ isPrime(102) //-> do not run the algorithm
 isPrime(103) //-> do not run the algorithm
 */
 function getAdder(){
-    var cache = {}
+    var cache = {};
     function add(x,y){
         console.log("processing ", x , " and ", y);
         return x + y;
@@ -39,4 +39,13 @@ function getAdder(){
     }
 }
 
+function memoize(fn){
+    var cache = {};
+    return function (){
+        var key = JSON.stringify(arguments);
+        if (typeof cache[key] === 'undefined')
+            cache[key] = fn.apply(this,arguments);
+        return cache[key];
+    }
+}
 
