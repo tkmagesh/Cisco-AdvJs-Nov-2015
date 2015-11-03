@@ -161,5 +161,155 @@ print("Filter", function(){
            var nonCategory1Products = filter(products, nonCategory1ProductCriteria);
            console.table(nonCategory1Products);
        });
-   })
+   });
+});
+
+print("Any", function(){
+    function any(list, predicate){
+        for(var i=0; i<list.length; i++)
+            if (predicate(list[i])) return true;
+        return false;
+    }
+    var costlyProductCriteria = function(product){
+       return product.cost > 50;
+    };
+    console.log("Are there any costly products - ?", any(products, costlyProductCriteria));
+});
+
+print("All", function(){
+    function all(list, predicate){
+        for(var i=0; i<list.length; i++)
+            if (!predicate(list[i])) return false;
+        return true;
+    }
+    var costlyProductCriteria = function(product){
+       return product.cost > 50;
+    };
+    console.log("Are all the products costly ? - ", all(products, costlyProductCriteria));
+});
+
+print("Sum", function(){
+   function sum(list, valueSelector){
+       var result = 0;
+       for(var i=0; i<list.length; i++)
+           result += valueSelector(list[i]);
+       return result;
+   }
+   var productValueSelector = function(product){ return product.cost * product.units;};
+    var totalProductValue = sum(products, productValueSelector);
+    console.log("Total product value = ", totalProductValue);
+});
+print("Min", function(){
+   function min(list, valueSelector){
+       var result = valueSelector(list[0]);
+       for(var i=1; i<list.length; i++){
+           var value = valueSelector(list[i]);
+           if (value < result) result = value;
+       }
+       return result;
+   }
+   var productCostSelector = function(product){ return product.cost;};
+   var costOfCheapestProduct = min(products, productCostSelector);
+    console.log("Cost of the cheapest product = ", costOfCheapestProduct);
+});
+print("Max", function(){
+   function max(list, valueSelector){
+       var result = valueSelector(list[0]);
+       for(var i=1; i<list.length; i++){
+           var value = valueSelector(list[i]);
+           if (value > result) result = value;
+       }
+       return result;
+   }
+   var productCostSelector = function(product){ return product.cost;};
+   var costOfCostliestProduct = max(products, productCostSelector);
+    console.log("Cost of the Costliest product = ", costOfCostliestProduct);
+});
+print("Aggregate", function(){
+    function aggregate(list, iterator, seed){
+        var result = seed;
+        for(var i=0; i<list.length; i++)
+            result = iterator(result, list[i]);
+        return result;
+    }
+
+    var minCost = aggregate(products, function(result, product){
+        return result < product.cost ? result : product.cost;
+    }, Number.MAX_VALUE);
+    console.log("Min cost = ", minCost);
+
+    var maxCost = aggregate(products, function(result, product){
+        return result > product.cost ? result : product.cost;
+    }, Number.MIN_VALUE);
+    console.log("Max cost = ", maxCost);
+
+    var sumOfProductValue = aggregate(products, function(result, product){
+      return result + (product.cost * product.units);
+    },0);
+    console.log("Sum of product value = ", sumOfProductValue);
+});
+print("Transform", function(){
+    function transform(list, iterator){
+        var result = [];
+        for(var i=0; i<list.length; i++)
+            result.push(iterator(list[i]));
+        return result;
+    }
+
+    print("Products after 10% discount", function(){
+        var productsAfterDiscount = transform(products, function(product){
+            return {
+                id : product.id,
+                name : product.name,
+                cost : product.cost * 0.9
+            };
+        });
+        console.table(productsAfterDiscount);
+    });
+});
+print("Each", function(){
+    function each(list, iterator){
+        for(var i=0; i<list.length; i++)
+            iterator(list[i]);
+    }
+
+    print("Products after 10% discount", function(){
+        var productsAfterDiscount = each(products, function(product){
+            product.cost = product.cost * 0.9;
+        });
+        console.table(products);
+    });
+});
+
+print("GroupBy", function(){
+    function groupBy(list, keySelector){
+        var result = {};
+        for(var i=0; i<list.length; i++){
+            var key = keySelector(list[i]);
+            if (typeof result[key] === 'undefined')
+                result[key] = [];
+            result[key].push(list[i]);
+        }
+        return result;
+    }
+    function printGroup(obj){
+        for(var key in obj){
+            print("key - [" + key + "]", function(){
+                console.table(obj[key]);
+            });
+        }
+    }
+
+    print("Products by category", function(){
+        var productsByCategory = groupBy(products, function(product){
+            return product.category;
+        });
+        printGroup(productsByCategory);
+    });
+    print("Products by cost ", function(){
+        var productsByCost = groupBy(products, function(product){
+            return product.cost > 50 ? "costly" : "affordable";
+        });
+        printGroup(productsByCost);
+    });
 });

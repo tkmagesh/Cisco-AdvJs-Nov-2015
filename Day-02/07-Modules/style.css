@@ -1,0 +1,14 @@
+.field{
+            margin-bottom: 10px;
+        }
+        label{
+            display: block;
+        }
+        #divResult {
+            color : red;
+            font-size: 22pt;
+            font-weight: bold;
+        }
+        #salaryList{
+            width: 60%;
+        }
